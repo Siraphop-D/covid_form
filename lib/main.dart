@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shoppingapp/screens/navigation_screen.dart';
-import 'package:shoppingapp/screens/splash_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -13,101 +11,250 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'ECommerce Shopping',
+      title: 'Flutter Demo',
       theme: ThemeData(
-        primaryColor: Color(0xFFEF6969),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: NavigationScreen(),
+      home: const Formpage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
+class Formpage extends StatefulWidget {
+  const Formpage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<Formpage> createState() => _FormpageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _FormpageState extends State<Formpage> {
+  final _formkey = GlobalKey<FormState>();
+  late String firstname;
+  late String lastname;
+  late int age;
 
-  void _incrementCounter() {
+  String? selectedGender;
+
+  bool _isOption1 = false;
+  bool _isOption2 = false;
+  bool _isOption3 = false;
+
+  List<String> selectedOptions = [];
+  void _onRadioButtonChange(String value) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      selectedGender = value;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text("Patient Form"),
+        backgroundColor: Colors.transparent,
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(10.0),
+          child: Form(
+            key: _formkey,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: <Widget>[
+                  Text("Firstname"),
+                  TextFormField(
+                    onSaved: (value) => setState(() {
+                      firstname = value!;
+                    }),
+                  ),
+                  Text("Lastname"),
+                  TextFormField(
+                    onSaved: (value) => setState(() {
+                      lastname = value!;
+                    }),
+                  ),
+                  Text("Age"),
+                  TextFormField(
+                    keyboardType: TextInputType.number,
+                    onSaved: (value) => setState(() {
+                      age = int.parse(value!);
+                    }),
+                  ),
+                  Text("Gender"),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text('Male'),
+                      Radio(
+                          value: 'Male',
+                          groupValue: selectedGender,
+                          onChanged: (value) => _onRadioButtonChange(value!)),
+                      Text('Female'),
+                      Radio(
+                          value: 'Female',
+                          groupValue: selectedGender,
+                          onChanged: (value) => _onRadioButtonChange(value!))
+                    ],
+                  ),
+                  Text("Symtomps"),
+                  Column(
+                    children: [
+                      CheckboxListTile(
+                        title: Text("ไอ"),
+                        value: _isOption1,
+                        onChanged: (val) {
+                          setState(() {
+                            _isOption1 = !_isOption1;
+                            if (_isOption1) {
+                              selectedOptions.add('ไอ');
+                            } else {
+                              selectedOptions.remove('ไอ');
+                            }
+                          });
+                        },
+                      ),
+                      CheckboxListTile(
+                        title: Text("เจ็บคอ"),
+                        value: _isOption2,
+                        onChanged: (val) {
+                          setState(() {
+                            _isOption2 = !_isOption2;
+                            if (_isOption2) {
+                              selectedOptions.add('เจ็บคอ');
+                            } else {
+                              selectedOptions.remove('เจ็บคอ');
+                            }
+                          });
+                        },
+                      ),
+                      CheckboxListTile(
+                        title: Text("มีไข้"),
+                        value: _isOption3,
+                        onChanged: (val) {
+                          setState(() {
+                            _isOption3 = !_isOption3;
+                            if (_isOption3) {
+                              selectedOptions.add('มีไข้');
+                            } else {
+                              selectedOptions.remove('มีไข้');
+                            }
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      if (_formkey.currentState!.validate()) {
+                        _formkey.currentState!.save();
+                        print(firstname);
+
+                        print(selectedGender);
+                        print(selectedOptions);
+                        print('Save');
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => Page1(
+                                    firstname: firstname,
+                                    lastname: lastname,
+                                    age: age,
+                                    gender: selectedGender,
+                                    symtomps: selectedOptions,
+                                  )),
+                        );
+                      }
+                    },
+                    child: Text("Save"),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class Page1 extends StatelessWidget {
+  const Page1({
+    Key? key,
+    this.firstname,
+    this.lastname,
+    required this.age,
+    this.gender,
+    required this.symtomps,
+  }) : super(key: key);
+
+  final String? firstname;
+  final String? lastname;
+  final int age;
+  final String? gender;
+
+  final List<String> symtomps;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          "Report",
+          style: TextStyle(color: Colors.black),
+        ),
+        backgroundColor: Colors.transparent,
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+          children: [
+            Container(
+              width: 250,
+              height: 250,
+              child: Image.network(
+                'https://as2.ftcdn.net/v2/jpg/03/30/96/09/1000_F_330960978_aWCwNWhAo3i7azG4wfvskSCoWGPw8fCY.jpg',
+                fit: BoxFit.cover,
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            SizedBox(height: 50),
+            covidDetect(symtomps)
           ],
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        onPressed: () {},
+        child: Text('ยืนยัน'),
+        backgroundColor: Colors.blue.shade300,
+      ),
     );
+  }
+
+  Widget covidDetect(List<String> symtomps) {
+    if (symtomps.length == 3) {
+      return Container(
+        width: 300,
+        height: 60,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.redAccent.shade400,
+        ),
+        child: Center(
+            child: Text("คุณ $firstname $lastname, อายุ $age คุณเป็นโควิท")),
+      );
+    } else {
+      return Container(
+        width: 300,
+        height: 50,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.greenAccent.shade400,
+        ),
+        child: Center(
+            child:
+                Text("คุณ $firstname $lastname, อายุ $ageคุณไม่ได้เป็นโควิท")),
+      );
+    }
   }
 }
